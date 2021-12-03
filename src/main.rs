@@ -43,7 +43,7 @@ fn stream_read_and_write(
     let mut reader = csv_reader_stream(input_filename)?;
     let mut writer = csv_writer_stream(output_filename)?;
     let headers = reader.headers().expect("Could not get headers");
-    dbg!(headers);
+    // dbg!(headers);
     let second_header = headers
         .into_iter()
         .nth(1)
