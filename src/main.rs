@@ -42,7 +42,7 @@ fn stream_read_and_write(
 ) -> Result<(), Box<dyn Error>> {
     let mut reader = csv_reader_stream(input_filename)?;
     let mut writer = csv_writer_stream(output_filename)?;
-    let headers = reader.headers().expect("Could not get headers");
+    let headers = reader.headers()?;
     // dbg!(headers);
 
     let new_headers = vec![headers[1].to_string(), headers[3].to_string()];
@@ -55,7 +55,7 @@ fn stream_read_and_write(
 
 fn read_csv_rows(reader: &mut Reader<File>, writer: &mut Writer<File>) -> Result<(), Box<dyn Error>> {
     for result in reader.records() {
-        let record = result.expect("got malformed csv");
+        let record = result?;
 
         let row = vec![record[1].to_string(), record[3].to_string()];
 
