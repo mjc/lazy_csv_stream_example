@@ -65,7 +65,7 @@ fn stream_read_and_write(
             .into_iter()
             .nth(3)
             .expect("could not find fourth column");
-        dbg!(second, fourth);
+        // dbg!(second, fourth);
 
         writer
             .write_record([second, fourth])
