@@ -44,17 +44,10 @@ fn stream_read_and_write(
     let mut writer = csv_writer_stream(output_filename)?;
     let headers = reader.headers().expect("Could not get headers");
     // dbg!(headers);
-    let second_header = headers
-        .into_iter()
-        .nth(1)
-        .expect("could not get second header");
-    let fourth_header = headers
-        .into_iter()
-        .nth(3)
-        .expect("could not get fourth header");
 
+    let new_headers = vec![headers[1].to_string(), headers[3].to_string()];
     writer
-        .write_record([second_header, fourth_header])
+        .write_record(new_headers)
         .expect("could not write headers");
 
     read_csv_rows(&mut reader, &mut writer)
@@ -63,23 +56,16 @@ fn stream_read_and_write(
 fn read_csv_rows(reader: &mut Reader<File>, writer: &mut Writer<File>) -> Result<(), Box<dyn Error>> {
     for result in reader.records() {
         let record = result.expect("got malformed csv");
-        let second = record
-            .into_iter()
-            .nth(1)
-            .expect("could not find second column");
-        let fourth = record
-            .into_iter()
-            .nth(3)
-            .expect("could not find fourth column");
-        // dbg!(second, fourth);
+
+        let row = vec![record[1].to_string(), record[3].to_string()];
 
         writer
-            .write_record([second, fourth])
-            .expect("could not write record");
+            .write_record(row)?;
     }
 
     Ok(())
 }
+
 
 fn get_file_name_from_first_argument() -> OsString {
     match env::args_os().nth(1) {
