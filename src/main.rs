@@ -7,6 +7,8 @@ use std::{
 
 use csv::{QuoteStyle, Reader, Trim, Writer, WriterBuilder};
 
+// cargo run --release large.csv  53.87s user 3.94s system 85% cpu 1:07.54 total
+
 fn csv_reader_stream(in_file_path: String) -> Result<Reader<File>, Box<dyn Error>> {
     let input_file = File::open(in_file_path)?;
     let reader = csv::ReaderBuilder::new()
