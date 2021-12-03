@@ -57,6 +57,10 @@ fn stream_read_and_write(
         .write_record([second_header, fourth_header])
         .expect("could not write headers");
 
+    read_csv_rows(&mut reader, &mut writer)
+}
+
+fn read_csv_rows(reader: &mut Reader<File>, writer: &mut Writer<File>) -> Result<(), Box<dyn Error>> {
     for result in reader.records() {
         let record = result.expect("got malformed csv");
         let second = record
