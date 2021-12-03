@@ -1,14 +1,11 @@
-use std::env;
-use std::error::Error;
-use std::ffi::OsString;
-use std::fs::File;
-use std::fs::OpenOptions;
+use std::{
+    env,
+    error::Error,
+    ffi::OsString,
+    fs::{File, OpenOptions},
+};
 
-use csv::QuoteStyle;
-use csv::Reader;
-use csv::Trim;
-use csv::Writer;
-use csv::WriterBuilder;
+use csv::{QuoteStyle, Reader, Trim, Writer, WriterBuilder};
 
 fn csv_reader_stream(in_file_path: String) -> Result<Reader<File>, Box<dyn Error>> {
     let input_file = File::open(in_file_path)?;
