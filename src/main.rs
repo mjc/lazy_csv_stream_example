@@ -58,7 +58,7 @@ fn stream_read_and_write(
         .expect("could not write headers");
 
     for result in reader.records() {
-        let record = result.expect("got malformed sv");
+        let record = result.expect("got malformed csv");
         let second = record
             .into_iter()
             .nth(1)
