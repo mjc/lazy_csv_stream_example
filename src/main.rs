@@ -1,7 +1,6 @@
 use std::{
     env,
     error::Error,
-    ffi::OsString,
     fs::{File, OpenOptions},
 };
 
@@ -53,32 +52,32 @@ fn stream_read_and_write(
     read_csv_rows(&mut reader, &mut writer)
 }
 
-fn read_csv_rows(reader: &mut Reader<File>, writer: &mut Writer<File>) -> Result<(), Box<dyn Error>> {
+fn read_csv_rows(
+    reader: &mut Reader<File>,
+    writer: &mut Writer<File>,
+) -> Result<(), Box<dyn Error>> {
     for result in reader.records() {
         let record = result?;
 
         let row = vec![record[1].to_string(), record[3].to_string()];
 
-        writer
-            .write_record(row)?;
+        writer.write_record(row)?;
     }
 
     Ok(())
 }
 
-
-fn get_file_name_from_first_argument() -> OsString {
-    match env::args_os().nth(1) {
-        None => From::from("expected 1 argument, but got none"),
-        Some(file_path) => file_path,
-    }
+fn get_file_name_from_first_argument() -> String {
+    env::args_os()
+        .nth(1)
+        .expect("No argument given")
+        .to_str()
+        .expect("Unicode path parsing problem")
+        .to_string()
 }
 
 fn main() {
-    let provided_filename = get_file_name_from_first_argument()
-        .to_str()
-        .expect("file name problem")
-        .to_string();
+    let provided_filename = get_file_name_from_first_argument();
     let out_file = "output.csv".to_string();
     match stream_read_and_write(provided_filename, out_file) {
         Ok(_) => println!("Written successfully"),
