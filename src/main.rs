@@ -55,13 +55,9 @@ fn stream_read_and_write(
     let mut reader = csv_reader_stream(input_filename)?;
     let mut writer = csv_writer_stream(output_filename)?;
 
-    // approximate line width
-    // if csv reader would give us the file position we would not need this
-    let line_width = 30;
-    let file_size = reader.get_ref().metadata()?.len();
-    let total_lines_estimate = file_size / (line_width as u64);
-
-    let mut progress = ProgressBar::new(total_lines_estimate);
+    // we could calculate the line count but meh
+    let demo_file_line_count = 352_406_719;
+    let mut progress = ProgressBar::new(demo_file_line_count);
     // massive files so let's not update so damn fast
     progress.set_max_refresh_rate(Some(Duration::from_secs(1)));
 
