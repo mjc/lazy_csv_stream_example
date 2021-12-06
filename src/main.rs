@@ -4,7 +4,15 @@ use std::{
     fs::{File, OpenOptions},
 };
 
+use serde::{Deserialize, Serialize};
+
 use csv::{QuoteStyle, Reader, Trim, Writer, WriterBuilder};
+
+#[derive(Debug, Serialize, Deserialize)]
+struct MyRow {
+    time: String,
+    butts: String,
+}
 
 // cargo run --release large.csv  53.87s user 3.94s system 85% cpu 1:07.54 total
 
@@ -41,29 +49,13 @@ fn stream_read_and_write(
 ) -> Result<(), Box<dyn Error>> {
     let mut reader = csv_reader_stream(input_filename)?;
     let mut writer = csv_writer_stream(output_filename)?;
-    let headers = reader.headers()?;
-    // dbg!(headers);
 
-    let new_headers = vec![headers[1].to_string(), headers[3].to_string()];
-    writer
-        .write_record(new_headers)
-        .expect("could not write headers");
-
-    read_csv_rows(&mut reader, &mut writer)
-}
-
-fn read_csv_rows(
-    reader: &mut Reader<File>,
-    writer: &mut Writer<File>,
-) -> Result<(), Box<dyn Error>> {
-    for result in reader.records() {
-        let record = result?;
-
-        let row = vec![record[1].to_string(), record[3].to_string()];
-
-        writer.write_record(row)?;
+    for result in reader.deserialize() {
+        let row: MyRow = result?;
+        // update these  and struct fields if column names are updated
+        // using serde and your own struct means it automatically adds headers
+        writer.serialize(row)?;
     }
-
     Ok(())
 }
 
