@@ -1,11 +1,13 @@
 use std::{
     env,
     fs::{File, OpenOptions},
+    time::Duration,
 };
 
+use pbr::ProgressBar;
 use serde::{Deserialize, Serialize};
 
-use csv::{QuoteStyle, Reader, Writer, WriterBuilder, Trim};
+use csv::{QuoteStyle, Reader, Trim, Writer, WriterBuilder};
 
 #[derive(Debug, Serialize, Deserialize)]
 struct MyRow {
@@ -13,13 +15,11 @@ struct MyRow {
     butts: String,
 }
 
-// cargo run --release large.csv  53.87s user 3.94s system 85% cpu 1:07.54 total
-
 fn csv_reader_stream(in_file_path: String) -> Result<Reader<File>, std::io::Error> {
     let input_file = File::open(in_file_path)?;
     let reader = csv::ReaderBuilder::new()
-    .trim(Trim::Headers)
-    .from_reader(input_file);
+        .trim(Trim::Headers)
+        .from_reader(input_file);
     Ok(reader)
 }
 
@@ -55,12 +55,25 @@ fn stream_read_and_write(
     let mut reader = csv_reader_stream(input_filename)?;
     let mut writer = csv_writer_stream(output_filename)?;
 
+    // approximate line width
+    // if csv reader would give us the file position we would not need this
+    let line_width = 30;
+    let file_size = reader.get_ref().metadata()?.len();
+    let total_lines_estimate = file_size / (line_width as u64);
+
+    let mut progress = ProgressBar::new(total_lines_estimate);
+    // massive files so let's not update so damn fast
+    progress.set_max_refresh_rate(Some(Duration::from_secs(1)));
+
     for result in reader.deserialize() {
         let row: MyRow = result?;
         // update these  and struct fields if column names are updated
         // using serde and your own struct means it automatically adds headers
         writer.serialize(row)?;
+
+        progress.inc();
     }
+    progress.finish();
     Ok(())
 }
 
